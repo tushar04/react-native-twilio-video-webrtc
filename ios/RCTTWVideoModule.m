@@ -268,15 +268,59 @@ RCT_EXPORT_METHOD(toggleSoundSetup:(BOOL)speaker) {
   NSError *error = nil;
   kTVIDefaultAVAudioSessionConfigurationBlock();
   AVAudioSession *session = [AVAudioSession sharedInstance];
-  AVAudioSessionMode mode = speaker ? AVAudioSessionModeVideoChat : AVAudioSessionModeVoiceChat ;
-  // Overwrite the audio route
+  AVAudioSessionMode mode = speaker ? AVAudioSessionModeVideoChat : AVAudioSessionModeVoiceChat;
   if (![session setMode:mode error:&error]) {
     NSLog(@"AVAudiosession setMode %@",error);
   }
+    if (!speaker) {
+        if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
+          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+        }
+    } else {
+        if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error]) {
+          NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
+        }
+    }
+    if (![session setActive:true error:&error]) {
+      NSLog(@"toggleSoundSetup AVAudiosession setActive ERROR: %@", error);
+    }
+}
 
-  if (![session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error]) {
-    NSLog(@"AVAudiosession overrideOutputAudioPort %@",error);
-  }
+RCT_EXPORT_METHOD(setRemoteAudioEnabled:(BOOL)enabled) {
+    if (self.room != nil) {
+        NSArray<TVIRemoteParticipant *> *remoteParticipants = [self.room remoteParticipants];
+        for(TVIRemoteParticipant *participant in remoteParticipants) {
+            NSArray<TVIRemoteAudioTrackPublication *> *trackPublications = participant.remoteAudioTracks;
+            for(TVIRemoteAudioTrackPublication *remoteAudioTrack in trackPublications) {
+                [remoteAudioTrack.remoteTrack setPlaybackEnabled:enabled];
+            }
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(setBluetoothHeadsetConnected:(BOOL)enabled) {
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+
+    NSError *error = nil;
+    if (enabled) {
+        if (![session setCategory:AVAudioSessionCategoryPlayAndRecord
+                             mode:AVAudioSessionModeVideoChat
+                          options:AVAudioSessionCategoryOptionAllowBluetooth
+                            error:&error]) {
+            NSLog(@" toggleBluetoothHeadset AVAudioSession setCategory:options:mode:error: %@",error);
+        }
+    } else {
+        if (![session setCategory:AVAudioSessionCategoryPlayAndRecord
+                             mode:AVAudioSessionModeVoiceChat
+                          options:AVAudioSessionCategoryOptionDefaultToSpeaker
+                            error:&error]) {
+            NSLog(@"toggleBluetoothHeadset AVAudioSession setCategory:options:mode:error: %@",error);
+        }
+    }
+    
+    if (![session setActive:true error:&error]) {
+      NSLog(@"toggleBluetoothHeadset AVAudiosession setActive ERROR: %@", error);
+    }
 }
 
 -(void)convertBaseTrackStats:(TVIBaseTrackStats *)stats result:(NSMutableDictionary *)result {
