@@ -143,19 +143,19 @@ export default class extends Component {
     ...View.propTypes
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this._subscriptions = []
     this._eventEmitter = new NativeEventEmitter(TWVideoModule)
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this._registerEvents()
     this._startLocalAudio()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this._unregisterEvents()
     this._stopLocalVideo()
     this._stopLocalAudio()
@@ -164,50 +164,52 @@ export default class extends Component {
   /**
    * Locally mute/ unmute all remote audio tracks from a given participant
    */
-  setRemoteAudioPlayback ({ participantSid, enabled }) {
+  setRemoteAudioPlayback({ participantSid, enabled }) {
     TWVideoModule.setRemoteAudioPlayback(participantSid, enabled)
   }
 
-  setRemoteAudioEnabled (enabled) {
+  setRemoteAudioEnabled(enabled) {
+    TWVideoModule.setRemoteAudioEnabled(enabled)
     return Promise.resolve(enabled)
   }
 
-  setBluetoothHeadsetConnected (enabled) {
+  setBluetoothHeadsetConnected(enabled) {
+    TWVideoModule.setBluetoothHeadsetConnected(enabled)
     return Promise.resolve(enabled)
   }
 
   /**
    * Enable or disable local video
    */
-  setLocalVideoEnabled (enabled) {
+  setLocalVideoEnabled(enabled) {
     return TWVideoModule.setLocalVideoEnabled(enabled)
   }
 
   /**
    * Enable or disable local audio
    */
-  setLocalAudioEnabled (enabled) {
+  setLocalAudioEnabled(enabled) {
     return TWVideoModule.setLocalAudioEnabled(enabled)
   }
 
   /**
    * Filp between the front and back camera
    */
-  flipCamera () {
+  flipCamera() {
     TWVideoModule.flipCamera()
   }
 
   /**
    * Toggle audio setup from speaker (default) and headset
    */
-  toggleSoundSetup (speaker) {
+  toggleSoundSetup(speaker) {
     TWVideoModule.toggleSoundSetup(speaker)
   }
 
   /**
    * Get connection stats
    */
-  getStats () {
+  getStats() {
     TWVideoModule.getStats()
   }
 
@@ -217,42 +219,42 @@ export default class extends Component {
    * @param  {String} accessToken The Twilio's JWT access token
    * @param  {String} encodingParameters Control Encoding config
    */
-  connect ({ roomName, accessToken, enableVideo = true, encodingParameters }) {
+  connect({ roomName, accessToken, enableVideo = true, encodingParameters }) {
     TWVideoModule.connect(accessToken, roomName, enableVideo, encodingParameters)
   }
 
   /**
    * Disconnect from current room
    */
-  disconnect () {
+  disconnect() {
     TWVideoModule.disconnect()
   }
 
   /**
    * Publish a local audio track
    */
-  publishLocalAudio () {
+  publishLocalAudio() {
     TWVideoModule.publishLocalAudio()
   }
 
   /**
    * Publish a local video track
    */
-  publishLocalVideo () {
+  publishLocalVideo() {
     TWVideoModule.publishLocalVideo()
   }
 
   /**
    * Unpublish a local audio track
    */
-  unpublishLocalAudio () {
+  unpublishLocalAudio() {
     TWVideoModule.unpublishLocalAudio()
   }
 
   /**
    * Unpublish a local video track
    */
-  unpublishLocalVideo () {
+  unpublishLocalVideo() {
     TWVideoModule.unpublishLocalVideo()
   }
 
@@ -260,33 +262,33 @@ export default class extends Component {
    * SendString to datatrack
    * @param  {String} message    The message string to send
    */
-  sendString (message) {
+  sendString(message) {
     TWVideoModule.sendString(message)
   }
 
-  _startLocalVideo () {
+  _startLocalVideo() {
     TWVideoModule.startLocalVideo()
   }
 
-  _stopLocalVideo () {
+  _stopLocalVideo() {
     TWVideoModule.stopLocalVideo()
   }
 
-  _startLocalAudio () {
+  _startLocalAudio() {
     TWVideoModule.startLocalAudio()
   }
 
-  _stopLocalAudio () {
+  _stopLocalAudio() {
     TWVideoModule.stopLocalAudio()
   }
 
-  _unregisterEvents () {
+  _unregisterEvents() {
     TWVideoModule.changeListenerStatus(false)
     this._subscriptions.forEach(e => e.remove())
     this._subscriptions = []
   }
 
-  _registerEvents () {
+  _registerEvents() {
     TWVideoModule.changeListenerStatus(true)
     this._subscriptions = [
       this._eventEmitter.addListener('roomDidConnect', data => {
@@ -397,7 +399,7 @@ export default class extends Component {
     ]
   }
 
-  render () {
+  render() {
     return this.props.children || null
   }
 }
